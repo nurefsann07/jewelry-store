@@ -1,7 +1,7 @@
 # 💍🌙 MoonStone- Online Jewelry Store
 
 ## Project Description
-GemVault is a web-based e-commerce platform for buying and selling jewelry. 
+MoonStone is a web-based e-commerce platform for buying and selling jewelry. 
 Users can browse collections, create accounts, purchase products, and track their orders.
 Admins can manage inventory, users, and orders.
 
