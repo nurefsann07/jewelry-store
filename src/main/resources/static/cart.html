@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOONSTONE — Your Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #FAF8F5;
+      --black: #0E0E0E;
+      --gold: #B8965A;
+      --gold-light: #D4AF7A;
+      --gray: #888;
+      --light-gray: #E8E4DF;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Jost', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--cream); color: var(--black); }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 60px; height: 72px;
+      background: rgba(250,248,245,0.93); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--light-gray);
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.14em; color: var(--black); text-decoration: none; }
+    .nav-link { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--gold); }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 140px 60px 100px; }
+    .page-eyebrow { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(40px, 5vw, 56px); font-weight: 300; margin-bottom: 60px; }
+    .page-title em { font-style: italic; color: var(--gold); }
+
+    .layout { display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+
+    /* CART ITEM */
+    .item { display: grid; grid-template-columns: 120px 1fr auto; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--light-gray); align-items: center; }
+    .item-img { width: 120px; height: 150px; object-fit: cover; background: var(--light-gray); }
+    .item-info { display: flex; flex-direction: column; gap: 8px; }
+    .item-name { font-family: var(--font-display); font-size: 22px; font-weight: 400; }
+    .item-price { font-size: 13px; color: var(--gray); letter-spacing: 0.04em; }
+    .item-controls { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+    .qty-btn { width: 28px; height: 28px; border: 1px solid var(--light-gray); background: var(--cream); cursor: pointer; font-size: 14px; transition: all 0.2s; font-family: var(--font-body); color: var(--black); }
+    .qty-btn:hover { border-color: var(--black); }
+    .qty-val { font-size: 14px; min-width: 24px; text-align: center; }
+    .item-remove { background: none; border: none; color: var(--gray); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: color 0.2s; font-family: var(--font-body); }
+    .item-remove:hover { color: #c0392b; }
+    .item-subtotal { font-family: var(--font-display); font-size: 22px; font-weight: 400; text-align: right; min-width: 100px; }
+
+    /* SUMMARY */
+    .summary { background: white; padding: 36px; position: sticky; top: 100px; }
+    .summary-title { font-family: var(--font-display); font-size: 26px; font-weight: 300; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--light-gray); }
+    .summary-row { display: flex; justify-content: space-between; padding: 12px 0; font-size: 13px; color: var(--gray); }
+    .summary-row.total { border-top: 1px solid var(--light-gray); margin-top: 16px; padding-top: 22px; font-size: 18px; color: var(--black); font-family: var(--font-display); font-weight: 400; }
+    .summary-row.total .amount { font-size: 26px; color: var(--gold); }
+    .btn-checkout { display: block; width: 100%; padding: 18px; margin-top: 32px; background: var(--black); color: var(--cream); border: none; font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; transition: background 0.25s; font-family: var(--font-body); }
+    .btn-checkout:hover { background: var(--gold); }
+
+    /* STATES */
+    .state { text-align: center; padding: 100px 40px; color: var(--gray); }
+    .state h2 { font-family: var(--font-display); font-size: 32px; font-weight: 300; color: var(--black); margin-bottom: 12px; }
+    .state p { font-size: 14px; margin-bottom: 28px; }
+    .state a { display: inline-block; padding: 14px 32px; background: var(--black); color: var(--cream); text-decoration: none; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; transition: background 0.25s; }
+    .state a:hover { background: var(--gold); }
+
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--black); color: var(--cream); padding: 14px 28px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; transition: transform 0.4s; z-index: 1000; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .summary { position: static; }
+      .wrap { padding: 120px 24px 60px; }
+      nav { padding: 0 24px; }
+      .item { grid-template-columns: 90px 1fr; }
+      .item-img { width: 90px; height: 110px; }
+      .item-subtotal { grid-column: 2; text-align: left; font-size: 18px; }
+    }
+    /* Confirm Modal */
+    .modal-bg { position: fixed; inset: 0; background: rgba(14,14,14,0.65); backdrop-filter: blur(6px); z-index: 1500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-bg.open { display: flex; }
+    .modal-box { background: var(--cream); max-width: 480px; width: 100%; padding: 48px 40px; text-align: center; }
+    .modal-eyebrow { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+    .modal-title { font-family: var(--font-display); font-size: 36px; font-weight: 300; margin-bottom: 18px; }
+    .modal-title em { font-style: italic; color: var(--gold); }
+    .modal-desc { font-size: 14px; color: var(--gray); line-height: 1.7; margin-bottom: 16px; }
+    .modal-total { font-family: var(--font-display); font-size: 32px; color: var(--gold); margin: 24px 0 36px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+    .modal-btn { padding: 14px 32px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; border: none; font-family: var(--font-body); transition: all 0.25s; }
+    .modal-cancel { background: transparent; color: var(--gray); border: 1px solid var(--light-gray); }
+    .modal-cancel:hover { color: var(--black); border-color: var(--black); }
+    .modal-confirm { background: var(--black); color: var(--cream); }
+    .modal-confirm:hover { background: var(--gold); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MOONSTONE</a>
+  <a href="index.html" class="nav-link">← Continue Shopping</a>
+</nav>
+
+<div class="wrap">
+  <p class="page-eyebrow">Shopping Bag</p>
+  <h1 class="page-title">Your <em>Cart</em></h1>
+
+  <div id="content">
+    <div class="state"><p>Loading…</p></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const token = localStorage.getItem('ms_token');
+
+  // Giriş kontrolü
+  if (!token) {
+    window.location.href = 'login.html';
+  } else {
+    loadCart();
+  }
+
+  async function loadCart() {
+    try {
+      const res = await fetch('/api/cart', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem('ms_token');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const items = await res.json();
+      renderCart(items);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('content').innerHTML = `
+        <div class="state"><h2>Could not load your cart</h2><p>Please try again later.</p></div>
+      `;
+    }
+  }
+
+  function renderCart(items) {
+    if (items.length === 0) {
+      document.getElementById('content').innerHTML = `
+        <div class="state">
+          <h2>Your cart is empty</h2>
+          <p>Discover our collection and find something extraordinary.</p>
+          <a href="index.html">Browse Collection</a>
+        </div>
+      `;
+      return;
+    }
+
+    const total = items.reduce((sum, i) => sum + i.subtotal, 0);
+    const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+
+    document.getElementById('content').innerHTML = `
+      <div class="layout">
+        <div class="items">
+          ${items.map(i => `
+            <div class="item" data-id="${i.id}">
+              <img class="item-img" src="${i.productImageUrl}" alt="${i.productName}" />
+              <div class="item-info">
+                <p class="item-name">${i.productName}</p>
+                <p class="item-price">$${i.productPrice.toLocaleString()}</p>
+                <div class="item-controls">
+                  <button class="qty-btn" onclick="updateQty(${i.id}, ${i.quantity - 1})">−</button>
+                  <span class="qty-val">${i.quantity}</span>
+                  <button class="qty-btn" onclick="updateQty(${i.id}, ${i.quantity + 1})">+</button>
+                  <button class="item-remove" onclick="removeItem(${i.id})">Remove</button>
+                </div>
+              </div>
+              <p class="item-subtotal">$${i.subtotal.toLocaleString()}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <aside class="summary">
+          <h2 class="summary-title">Order Summary</h2>
+          <div class="summary-row"><span>Items</span><span>${itemCount}</span></div>
+          <div class="summary-row"><span>Subtotal</span><span>$${total.toLocaleString()}</span></div>
+          <div class="summary-row"><span>Shipping</span><span>Complimentary</span></div>
+          <div class="summary-row total"><span>Total</span><span class="amount">$${total.toLocaleString()}</span></div>
+          <button class="btn-checkout" onclick="openConfirm(${total})">Proceed to Checkout</button>
+        </aside>
+      </div>
+    `;
+  }
+
+  async function updateQty(itemId, newQty) {
+    try {
+      const res = await fetch('/api/cart/items/' + itemId, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ quantity: newQty })
+      });
+      if (!res.ok && res.status !== 204) throw new Error('Failed');
+      loadCart();
+    } catch (err) {
+      showToast('Could not update');
+    }
+  }
+
+  async function removeItem(itemId) {
+    try {
+      const res = await fetch('/api/cart/items/' + itemId, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) throw new Error('Failed');
+      showToast('Item removed');
+      loadCart();
+    } catch (err) {
+      showToast('Could not remove');
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+  // 🛍️ Sipariş Onayı
+  function openConfirm(total) {
+    document.getElementById('modalTotal').textContent = '$' + total.toLocaleString();
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('confirmModal').classList.remove('open');
+  }
+
+  async function confirmOrder() {
+    try {
+      const res = await fetch('/api/orders/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem('ms_token');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || 'Could not place order. Please try again.');
+        return;
+      }
+
+      const order = await res.json();
+      closeModal();
+
+      // Başarı ekranı
+      document.querySelector('.wrap').innerHTML = `
+        <div style="text-align: center; padding: 80px 20px;">
+          <p class="page-eyebrow">Confirmed</p>
+          <h1 class="page-title">Thank <em>You</em></h1>
+          <p style="font-size: 15px; color: var(--gray); line-height: 1.8; max-width: 480px; margin: 0 auto 12px;">Your order has been confirmed. We'll begin handcrafting your piece(s) with care.</p>
+          <p style="font-size: 13px; color: var(--gray); margin-bottom: 8px;">Order Number</p>
+          <p style="font-family: var(--font-display); font-size: 42px; color: var(--gold); margin-bottom: 40px;">#${order.id}</p>
+          <a href="profile.html" style="display: inline-block; padding: 16px 40px; background: var(--black); color: var(--cream); text-decoration: none; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;">View My Orders</a>
+        </div>
+      `;
+    } catch (err) {
+      alert('Could not connect. Please try again.');
+    }
+  }
+</script>
+<div class="modal-bg" id="confirmModal">
+  <div class="modal-box">
+    <p class="modal-eyebrow">Final Step</p>
+    <h2 class="modal-title">Confirm Your <em>Order</em></h2>
+    <p class="modal-desc">By confirming, your appointment with the MOONSTONE collection will be sealed.</p>
+    <p class="modal-total" id="modalTotal">$0</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-confirm" onclick="confirmOrder()">Confirm Order</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOONSTONE — Book Appointment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #FAF8F5; --black: #0E0E0E; --gold: #B8965A; --gold-light: #D4AF7A;
+      --gray: #888; --light-gray: #E8E4DF;
+      --font-display: 'Cormorant Garamond', serif; --font-body: 'Jost', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--cream); color: var(--black); min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0 60px; height: 72px; border-bottom: 1px solid var(--light-gray); }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.14em; color: var(--black); text-decoration: none; }
+    .nav-back { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+    .nav-back:hover { color: var(--gold); }
+
+    .page-hero { text-align: center; padding: 72px 60px 56px; border-bottom: 1px solid var(--light-gray); animation: fadeUp 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .page-eyebrow { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(32px, 5vw, 54px); font-weight: 300; line-height: 1.15; margin-bottom: 18px; }
+    .page-title em { font-style: italic; color: var(--gold); }
+    .page-subtitle { font-size: 14px; font-weight: 300; color: var(--gray); max-width: 520px; margin: 0 auto; line-height: 1.9; }
+
+    .booking-wrap { max-width: 1000px; margin: 0 auto; padding: 72px 40px 100px; display: grid; grid-template-columns: 1fr 380px; gap: 64px; animation: fadeUp 0.8s 0.2s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+
+    /* STEPS */
+    .step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 48px; }
+    .step { display: flex; align-items: center; gap: 10px; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--light-gray); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gray); transition: all 0.3s; flex-shrink: 0; }
+    .step.active .step-num { background: var(--gold); border-color: var(--gold); color: white; }
+    .step.done .step-num { background: var(--black); border-color: var(--black); color: white; }
+    .step-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); transition: color 0.3s; }
+    .step.active .step-label { color: var(--black); }
+    .step-line { flex: 1; height: 1px; background: var(--light-gray); margin: 0 16px; }
+
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+
+    .step-title { font-family: var(--font-display); font-size: 28px; font-weight: 300; margin-bottom: 32px; }
+    .step-title em { font-style: italic; color: var(--gold); }
+
+    /* SERVICE CARDS */
+    .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 36px; }
+    .service-card { border: 1px solid var(--light-gray); padding: 20px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .service-card:hover { border-color: var(--gold); }
+    .service-card.selected { border-color: var(--gold); background: rgba(184,150,90,0.05); }
+    .service-card input[type="radio"] { display: none; }
+    .service-name { font-family: var(--font-display); font-size: 18px; font-weight: 400; margin-bottom: 6px; }
+    .service-desc { font-size: 12px; font-weight: 300; color: var(--gray); line-height: 1.6; }
+    .service-duration { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-top: 12px; }
+
+    /* CALENDAR */
+    .calendar { margin-bottom: 36px; }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .cal-month { font-family: var(--font-display); font-size: 22px; font-weight: 300; }
+    .cal-nav { background: none; border: none; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--gray); transition: color 0.2s; font-size: 16px; }
+    .cal-nav:hover { color: var(--gold); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-dow { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); text-align: center; padding: 8px 0; }
+    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 300; cursor: pointer; border: 1px solid transparent; border-radius: 0; transition: all 0.2s; }
+    .cal-day:hover:not(.disabled):not(.empty) { border-color: var(--gold); color: var(--gold); }
+    .cal-day.selected { background: var(--gold); color: white; border-color: var(--gold); }
+    .cal-day.today { font-weight: 500; }
+    .cal-day.disabled { color: #ccc; cursor: default; }
+    .cal-day.empty { cursor: default; }
+
+    /* TIME SLOTS */
+    .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 36px; }
+    .time-slot { border: 1px solid var(--light-gray); padding: 11px; text-align: center; font-size: 13px; font-weight: 300; cursor: pointer; transition: all 0.2s; }
+    .time-slot:hover { border-color: var(--gold); color: var(--gold); }
+    .time-slot.selected { background: var(--gold); color: white; border-color: var(--gold); }
+    .time-slot.unavailable { color: #ccc; cursor: default; border-color: transparent; }
+
+    /* FORM */
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); margin-bottom: 10px; }
+    .form-input, .form-select, .form-textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--light-gray); padding: 12px 0; font-family: var(--font-body); font-size: 15px; font-weight: 300; color: var(--black); outline: none; transition: border-color 0.3s; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-bottom-color: var(--gold); }
+    .form-input::placeholder, .form-textarea::placeholder { color: #bbb; }
+    .form-select { appearance: none; cursor: pointer; }
+    .form-textarea { resize: none; min-height: 80px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .btn-next { background: var(--black); color: white; border: none; padding: 16px 48px; font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+    .btn-next:hover { background: var(--gold); }
+    .btn-back-step { background: transparent; color: var(--gray); border: 1px solid var(--light-gray); padding: 14px 32px; font-family: var(--font-body); font-size: 11px; font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-right: 12px; }
+    .btn-back-step:hover { border-color: var(--black); color: var(--black); }
+
+    /* SIDEBAR */
+    .sidebar { position: sticky; top: 32px; align-self: start; }
+    .summary-card { background: white; border: 1px solid var(--light-gray); padding: 32px; }
+    .summary-title { font-family: var(--font-display); font-size: 22px; font-weight: 300; margin-bottom: 24px; }
+    .summary-title em { font-style: italic; color: var(--gold); }
+    .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--light-gray); gap: 16px; }
+    .summary-row:last-of-type { border-bottom: none; }
+    .summary-key { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); }
+    .summary-val { font-size: 13px; font-weight: 300; text-align: right; color: var(--black); }
+    .summary-val.gold { color: var(--gold); font-family: var(--font-display); font-size: 16px; }
+    .advisors-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray); margin: 24px 0 12px; }
+    .advisor-card { border: 1px solid var(--light-gray); padding: 16px 18px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 8px; }
+    .advisor-card:hover { border-color: var(--gold); background: rgba(184,150,90,0.03); }
+    .advisor-card.selected { border-color: var(--gold); background: rgba(184,150,90,0.07); }
+    .advisor-initials { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; background: var(--light-gray); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 16px; color: var(--gold); }
+    .advisor-name { font-family: var(--font-display); font-size: 16px; font-weight: 400; }
+    .advisor-role { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); margin-top: 2px; }
+    .advisor-check { margin-left: auto; color: var(--gold); opacity: 0; transition: opacity 0.2s; }
+    .advisor-card.selected .advisor-check { opacity: 1; }
+
+    /* SUCCESS */
+    .success-screen { display: none; text-align: center; padding: 80px 40px; grid-column: 1 / -1; }
+    .success-screen.show { display: block; }
+    .success-icon { width: 72px; height: 72px; background: rgba(184,150,90,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; color: var(--gold); }
+    .success-screen h2 { font-family: var(--font-display); font-size: 42px; font-weight: 300; margin-bottom: 14px; }
+    .success-screen h2 em { font-style: italic; color: var(--gold); }
+    .success-screen p { font-size: 14px; font-weight: 300; color: var(--gray); max-width: 480px; margin: 0 auto 36px; line-height: 1.9; }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .booking-wrap { grid-template-columns: 1fr; padding: 40px 24px 80px; }
+      .sidebar { position: static; }
+      .service-grid { grid-template-columns: 1fr; }
+      .page-hero { padding: 48px 24px 40px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">MOONSTONE</a>
+  <a href="index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Store
+  </a>
+</nav>
+
+<div class="page-hero">
+  <p class="page-eyebrow">Private Consultation</p>
+  <h1 class="page-title">Book an <em>Appointment</em></h1>
+  <p class="page-subtitle">Experience our collection in an intimate setting with our expert jewelers guiding you every step of the way.</p>
+</div>
+
+<div class="booking-wrap" id="bookingWrap">
+  <div>
+    <!-- STEP INDICATOR -->
+    <div class="step-indicator">
+      <div class="step active" id="stepInd1"><div class="step-num">1</div><span class="step-label">Service</span></div>
+      <div class="step-line"></div>
+      <div class="step" id="stepInd2"><div class="step-num">2</div><span class="step-label">Date & Time</span></div>
+      <div class="step-line"></div>
+      <div class="step" id="stepInd3"><div class="step-num">3</div><span class="step-label">Details</span></div>
+    </div>
+
+    <!-- STEP 1: SERVICE -->
+    <div class="form-step active" id="step1">
+      <h2 class="step-title">Choose <em>Service</em></h2>
+      <div class="service-grid">
+        <label class="service-card" onclick="selectService(this,'Private Collection Viewing','60 min')">
+          <input type="radio" name="service" value="viewing" />
+          <p class="service-name">Private Viewing</p>
+          <p class="service-desc">Explore our latest collection in a dedicated private suite with a personal stylist.</p>
+          <p class="service-duration">60 minutes</p>
+        </label>
+        <label class="service-card" onclick="selectService(this,'Custom Design Consultation','90 min')">
+          <input type="radio" name="service" value="custom" />
+          <p class="service-name">Custom Design</p>
+          <p class="service-desc">Work with our master designer to create a completely bespoke piece.</p>
+          <p class="service-duration">90 minutes</p>
+        </label>
+        <label class="service-card" onclick="selectService(this,'Ring Sizing & Fitting','30 min')">
+          <input type="radio" name="service" value="sizing" />
+          <p class="service-name">Ring Sizing</p>
+          <p class="service-desc">Professional ring sizing and fitting service by our expert craftsmen.</p>
+          <p class="service-duration">30 minutes</p>
+        </label>
+        <label class="service-card" onclick="selectService(this,'Jewelry Repair Consultation','45 min')">
+          <input type="radio" name="service" value="repair" />
+          <p class="service-name">Repair Consultation</p>
+          <p class="service-desc">Bring your treasured pieces for an expert assessment and restoration plan.</p>
+          <p class="service-duration">45 minutes</p>
+        </label>
+      </div>
+      <button class="btn-next" onclick="goStep(2)">Continue →</button>
+    </div>
+
+    <!-- STEP 2: DATE & TIME -->
+    <div class="form-step" id="step2">
+      <h2 class="step-title">Pick <em>Date & Time</em></h2>
+      <div class="calendar">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+          <p class="cal-month" id="calMonth"></p>
+          <button class="cal-nav" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <p class="form-label">Available Times</p>
+      <div class="time-slots" id="timeSlots"></div>
+      <button class="btn-back-step" onclick="goStep(1)">Back</button>
+      <button class="btn-next" onclick="goStep(3)">Continue →</button>
+    </div>
+
+    <!-- STEP 3: DETAILS -->
+    <div class="form-step" id="step3">
+      <h2 class="step-title">Your <em>Details</em></h2>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-input" type="text" id="apptFirst" placeholder="Jane" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-input" type="text" id="apptLast" placeholder="Doe" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="apptEmail" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" type="tel" placeholder="+1 (555) 000-0000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <select class="form-select">
+          <option>New York — Fifth Avenue Flagship</option>
+          <option>Los Angeles — Rodeo Drive</option>
+          <option>London — Bond Street</option>
+          <option>Paris — Place Vendôme</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Special Requests</label>
+        <textarea class="form-textarea" placeholder="Any special occasion, preferences, or questions for our jeweler…"></textarea>
+      </div>
+      <button class="btn-back-step" onclick="goStep(2)">Back</button>
+      <button class="btn-next" onclick="submitBooking()">Confirm Booking</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="bookingSidebar">
+    <div class="summary-card">
+      <h3 class="summary-title">Booking <em>Summary</em></h3>
+      <div class="summary-row"><span class="summary-key">Service</span><span class="summary-val gold" id="sumService">—</span></div>
+      <div class="summary-row"><span class="summary-key">Date</span><span class="summary-val" id="sumDate">—</span></div>
+      <div class="summary-row"><span class="summary-key">Time</span><span class="summary-val" id="sumTime">—</span></div>
+      <div class="summary-row"><span class="summary-key">Duration</span><span class="summary-val" id="sumDuration">—</span></div>
+    </div>
+    <p class="advisors-label">Choose Your Advisor</p>
+    <div class="advisor-card selected" onclick="selectAdvisor(this, 'Melek Sena Güner')">
+      <div class="advisor-initials">MG</div>
+      <div>
+        <p class="advisor-name">Melek Sena Güner</p>
+        <p class="advisor-role">Senior Jewelry Advisor</p>
+      </div>
+      <svg class="advisor-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="advisor-card" onclick="selectAdvisor(this, 'Zehra Özdemir')">
+      <div class="advisor-initials">ZÖ</div>
+      <div>
+        <p class="advisor-name">Zehra Özdemir</p>
+        <p class="advisor-role">Senior Jewelry Advisor</p>
+      </div>
+      <svg class="advisor-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="advisor-card" onclick="selectAdvisor(this, 'Nurefşan Gürsoy')">
+      <div class="advisor-initials">NG</div>
+      <div>
+        <p class="advisor-name">Nurefşan Gürsoy</p>
+        <p class="advisor-role">Senior Jewelry Advisor</p>
+      </div>
+      <svg class="advisor-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h2>Appointment <em>Confirmed</em></h2>
+    <p>Thank you! Your appointment has been confirmed. A confirmation email has been sent to you. We look forward to welcoming you.</p>
+    <a href="index.html" style="display:inline-block;background:var(--black);color:white;text-decoration:none;padding:16px 44px;font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;">Return to Store</a>
+  </div>
+</div>
+
+<script>
+  let state = { service: '', duration: '', date: '', time: '' };
+  let currentMonth = new Date();
+  currentMonth.setDate(1);
+
+  const times = ['10:00 AM','10:30 AM','11:00 AM','11:30 AM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM'];
+
+
+  function selectService(el, name, dur) {
+    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    state.service = name; state.duration = dur;
+    document.getElementById('sumService').textContent = name;
+    document.getElementById('sumDuration').textContent = dur;
+  }
+
+  function goStep(n) {
+    if (n === 2 && !state.service) { alert('Please select a service.'); return; }
+    if (n === 3 && !state.date) { alert('Please select a date and time.'); return; }
+    if (n === 3 && !state.time) { alert('Please select a time slot.'); return; }
+    [1,2,3].forEach(i => {
+      document.getElementById('step'+i).classList.toggle('active', i === n);
+      const ind = document.getElementById('stepInd'+i);
+      ind.classList.remove('active','done');
+      if (i === n) ind.classList.add('active');
+      if (i < n) ind.classList.add('done');
+    });
+  }
+
+  function renderCal() {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('calMonth').textContent = months[currentMonth.getMonth()] + ' ' + currentMonth.getFullYear();
+    const grid = document.getElementById('calGrid');
+    const today = new Date();
+    const first = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+    const days = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 0).getDate();
+    let html = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+    for (let i = 0; i < first; i++) html += `<div class="cal-day empty"></div>`;
+    for (let d = 1; d <= days; d++) {
+      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d);
+      const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const isToday = date.toDateString() === today.toDateString();
+      const isSelected = state.date === d + ' ' + months[currentMonth.getMonth()];
+      let cls = 'cal-day';
+      if (isPast) cls += ' disabled';
+      if (isToday) cls += ' today';
+      if (isSelected) cls += ' selected';
+      html += `<div class="${cls}" onclick="${isPast ? '' : 'selectDate(this,' + d + ')'}">${d}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  function selectDate(el, d) {
+    document.querySelectorAll('.cal-day').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    state.date = d + ' ' + months[currentMonth.getMonth()];
+
+    // API için ISO format (YYYY-MM-DD)
+    const yyyy = currentMonth.getFullYear();
+    const mm = String(currentMonth.getMonth() + 1).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    state.dateISO = `${yyyy}-${mm}-${dd}`;
+
+    document.getElementById('sumDate').textContent = state.date + ', ' + currentMonth.getFullYear();
+    renderTimes();
+  }
+
+  async function renderTimes() {
+    const slotsEl = document.getElementById('timeSlots');
+    slotsEl.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray); font-size: 12px; padding: 8px;">Loading times…</p>';
+
+    let bookedSlots = [];
+    try {
+      const res = await fetch('/api/appointments/booked-slots?date=' + state.dateISO);
+      if (res.ok) bookedSlots = await res.json();
+    } catch (err) {
+      console.error('Booked slots fetch failed:', err);
+    }
+
+    slotsEl.innerHTML = times.map(t => {
+      const un = bookedSlots.includes(t);
+      return `<div class="time-slot${un ? ' unavailable' : ''}" onclick="${un ? '' : 'selectTime(this,\'' + t + '\')'}">${t}</div>`;
+    }).join('');
+  }
+
+  function selectTime(el, t) {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    state.time = t;
+    document.getElementById('sumTime').textContent = t;
+  }
+
+  function changeMonth(dir) {
+    currentMonth.setMonth(currentMonth.getMonth() + dir);
+    state.date = ''; state.time = '';
+    document.getElementById('sumDate').textContent = '—';
+    document.getElementById('sumTime').textContent = '—';
+    renderCal();
+    document.getElementById('timeSlots').innerHTML = '';
+  }
+
+  async function submitBooking() {
+    const first = document.getElementById('apptFirst').value.trim();
+    const email = document.getElementById('apptEmail').value.trim();
+    if (!first || !email) { alert('Please fill in your name and email.'); return; }
+
+    const token = localStorage.getItem('ms_token');
+    if (!token) {
+      alert('Please sign in to confirm your appointment.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          service: state.service,
+          duration: state.duration,
+          appointmentDate: state.dateISO,
+          appointmentTime: state.time,
+          advisor: state.advisor
+        })
+      });
+
+      if (res.status === 401) {
+        alert('Session expired. Please sign in again.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || 'Could not book. The slot may have just been taken — please refresh and try again.');
+        renderTimes(); // güncel slot durumunu yenile
+        return;
+      }
+
+      // Başarılı
+      document.getElementById('bookingSidebar').style.display = 'none';
+      document.querySelector('.step-indicator').style.display = 'none';
+      document.getElementById('step3').style.display = 'none';
+      document.getElementById('successScreen').classList.add('show');
+      document.querySelector('.booking-wrap').style.gridTemplateColumns = '1fr';
+    } catch (err) {
+      alert('Could not connect to server. Please try again.');
+      console.error(err);
+    }
+  }
+
+  // Pre-fill from localStorage
+  const user = JSON.parse(localStorage.getItem('ms_user') || 'null');
+  if (user) {
+    const parts = user.name.split(' ');
+    document.getElementById('apptFirst').value = parts[0] || '';
+    document.getElementById('apptLast').value = parts.slice(1).join(' ') || '';
+    document.getElementById('apptEmail').value = user.email || '';
+  }
+
+  renderCal();
+
+  function selectAdvisor(el, name) {
+    document.querySelectorAll('.advisor-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    state.advisor = name;
+  }
+  state.advisor = 'Melek Sena Güner';
+</script>
+</body>
+</html>

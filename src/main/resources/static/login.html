@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOONSTONE — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #FAF8F5; --black: #0E0E0E; --gold: #B8965A; --gold-light: #D4AF7A;
+      --gray: #888; --light-gray: #E8E4DF; --error: #c0392b;
+      --font-display: 'Cormorant Garamond', serif; --font-body: 'Jost', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--cream); color: var(--black); min-height: 100vh; display: flex; flex-direction: column; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0 60px; height: 72px; border-bottom: 1px solid var(--light-gray); }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.14em; color: var(--black); text-decoration: none; }
+    .nav-back { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+    .nav-back:hover { color: var(--gold); }
+    .page-wrap { flex: 1; display: grid; grid-template-columns: 1fr 1fr; }
+    .image-panel { position: relative; overflow: hidden; background: var(--black); animation: panelIn 1s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+    @keyframes panelIn { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+    .image-panel img { width: 100%; height: 100%; object-fit: cover; opacity: 0.55; }
+    .image-panel-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 56px; }
+    .image-panel-quote { font-family: var(--font-display); font-size: 32px; font-weight: 300; font-style: italic; color: white; line-height: 1.3; }
+    .image-panel-sub { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-light); margin-top: 12px; }
+    .form-panel { display: flex; align-items: center; justify-content: center; padding: 60px 80px; animation: formIn 0.9s 0.2s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+    @keyframes formIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+    .form-inner { width: 100%; max-width: 400px; }
+    .form-eyebrow { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .form-title { font-family: var(--font-display); font-size: 38px; font-weight: 300; line-height: 1.15; margin-bottom: 8px; }
+    .form-title em { font-style: italic; color: var(--gold); }
+    .form-subtitle { font-size: 13px; font-weight: 300; color: var(--gray); margin-bottom: 44px; line-height: 1.7; }
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); margin-bottom: 10px; }
+    .form-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--light-gray); padding: 12px 0; font-family: var(--font-body); font-size: 15px; font-weight: 300; color: var(--black); outline: none; transition: border-color 0.3s; }
+    .form-input:focus { border-bottom-color: var(--gold); }
+    .form-input::placeholder { color: #bbb; }
+    .form-input.error { border-bottom-color: var(--error); }
+    .form-error { font-size: 11px; color: var(--error); margin-top: 6px; display: none; }
+    .form-error.show { display: block; }
+    .form-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
+    .checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 300; color: var(--gray); cursor: pointer; }
+    .checkbox-label input { accent-color: var(--gold); width: 14px; height: 14px; }
+    .forgot-link { font-size: 12px; font-weight: 300; color: var(--gray); text-decoration: none; transition: color 0.2s; }
+    .forgot-link:hover { color: var(--gold); }
+    .btn-submit { width: 100%; background: var(--black); color: white; border: none; padding: 18px; font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; transition: background 0.25s; margin-bottom: 28px; }
+    .btn-submit:hover { background: var(--gold); }
+    .form-footer { text-align: center; font-size: 13px; font-weight: 300; color: var(--gray); }
+    .form-footer a { color: var(--gold); text-decoration: none; font-weight: 400; transition: color 0.2s; }
+    .form-footer a:hover { color: var(--black); }
+    .alert-success { background: rgba(184,150,90,0.1); border-left: 3px solid var(--gold); padding: 14px 18px; font-size: 13px; color: var(--black); margin-bottom: 24px; display: none; }
+    .alert-success.show { display: block; }
+    @media (max-width: 800px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .image-panel { display: none; }
+      nav { padding: 0 24px; }
+      .form-panel { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">MOONSTONE</a>
+  <a href="index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Store
+  </a>
+</nav>
+<div class="page-wrap">
+  <div class="image-panel">
+    <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1200&q=80" alt="Jewelry" />
+    <div class="image-panel-overlay">
+      <p class="image-panel-quote">"Where moonlight<br>meets craftsmanship."</p>
+      <p class="image-panel-sub">Fine Jewelry Since 1992</p>
+    </div>
+  </div>
+  <div class="form-panel">
+    <div class="form-inner">
+      <p class="form-eyebrow">Welcome back</p>
+      <h1 class="form-title">Sign <em>In</em></h1>
+      <p class="form-subtitle">Access your collection, appointments, and exclusive member offers.</p>
+      <div class="alert-success" id="successMsg">Signed in successfully! Redirecting…</div>
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input class="form-input" type="email" id="email" placeholder="your@email.com" autocomplete="email" />
+          <p class="form-error" id="emailErr">Please enter a valid email address.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+          <p class="form-error" id="passErr">Password must be at least 6 characters.</p>
+        </div>
+        <div class="form-row">
+          <label class="checkbox-label"><input type="checkbox" id="remember" /> Remember me</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-submit">Sign In</button>
+      </form>
+      <p class="form-footer">Don't have an account? <a href="register.html?=2">Create one</a></p>
+    </div>
+  </div>
+</div>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email');
+    const pass = document.getElementById('password');
+    const emailErr = document.getElementById('emailErr');
+    const passErr = document.getElementById('passErr');
+
+    email.classList.remove('error'); emailErr.classList.remove('show');
+    pass.classList.remove('error'); passErr.classList.remove('show');
+
+    let valid = true;
+    if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+      email.classList.add('error'); emailErr.classList.add('show'); valid = false;
+    }
+    if (!pass.value || pass.value.length < 6) {
+      pass.classList.add('error'); passErr.classList.add('show'); valid = false;
+    }
+    if (!valid) return;
+
+    const btn = this.querySelector('.btn-submit');
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.value, password: pass.value })
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('ms_token', data.token);
+        localStorage.setItem('ms_user', JSON.stringify({
+          userId: data.userId,
+          name: data.firstName + ' ' + data.lastName,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email
+        }));
+        document.getElementById('successMsg').classList.add('show');
+        setTimeout(() => window.location.href = 'profile.html', 800);
+      } else {
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        pass.classList.add('error');
+        passErr.textContent = data.error || 'Email veya şifre hatalı.';
+        passErr.classList.add('show');
+      }
+    } catch (err) {
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      passErr.textContent = 'Sunucuya ulaşılamadı.';
+      passErr.classList.add('show');
+    }
+  });
+</script>
+</body>
+</html>

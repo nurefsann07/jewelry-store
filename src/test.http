@@ -1,0 +1,11 @@
+### Yeni kullanıcı kaydı
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@test.com",
+  "phone": "+90 555 123 4567",
+  "password": "password123"
+}

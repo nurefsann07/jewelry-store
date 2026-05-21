@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOONSTONE — My Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  /* Geçmiş randevu stili */
+  .appt-item.past { opacity: 0.55; }
+  .appt-item.past .appt-title { text-decoration: line-through; color: var(--gray); }
+  .appt-item.past .appt-day { color: var(--gray); }
+  .appt-status.past { background: rgba(192,57,43,0.08); color: #c0392b; letter-spacing: 0.1em; }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #FAF8F5;
+      --white: #FFFFFF;
+      --black: #0E0E0E;
+      --gold: #B8965A;
+      --gold-light: #D4AF7A;
+      --gray: #888;
+      --light-gray: #E8E4DF;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Jost', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--cream); color: var(--black); }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; height: 72px; background: rgba(250,248,245,0.93); backdrop-filter: blur(14px); border-bottom: 1px solid var(--light-gray); }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.14em; color: var(--black); text-decoration: none; }
+    .nav-link { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--gold); }
+
+    /* PAGE */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 130px 60px 80px; }
+
+    /* PROFILE HEADER */
+    .profile-head { display: flex; align-items: center; gap: 32px; margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid var(--light-gray); }
+    .avatar { width: 110px; height: 110px; border-radius: 50%; background: var(--black); color: var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 38px; font-weight: 400; }
+    .profile-info h1 { font-family: var(--font-display); font-size: 42px; font-weight: 300; line-height: 1.1; margin-bottom: 6px; }
+    .profile-info h1 em { font-style: italic; color: var(--gold); }
+    .profile-info .email { font-size: 13px; color: var(--gray); margin-bottom: 14px; font-weight: 300; }
+    .badge-member { display: inline-block; padding: 6px 16px; background: rgba(184,150,90,0.1); color: var(--gold); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--light-gray); margin-bottom: 48px; overflow-x: auto; }
+    .tab { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); background: none; border: none; padding: 14px 24px; cursor: pointer; position: relative; transition: color 0.2s; font-family: var(--font-body); white-space: nowrap; }
+    .tab::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--gold); transform: scaleX(0); transition: transform 0.3s; }
+    .tab.active { color: var(--black); }
+    .tab.active::after { transform: scaleX(1); }
+    .tab:hover { color: var(--black); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* SECTION TITLE */
+    .section-title { font-family: var(--font-display); font-size: 28px; font-weight: 300; margin-bottom: 28px; }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    /* OVERVIEW STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 56px; }
+    .stat-card { background: var(--white); border: 1px solid var(--light-gray); padding: 24px; text-align: center; }
+    .stat-value { font-family: var(--font-display); font-size: 36px; font-weight: 300; line-height: 1; margin-bottom: 8px; color: var(--gold); }
+    .stat-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); }
+
+    /* APPOINTMENTS */
+    .appt-list { display: flex; flex-direction: column; gap: 16px; }
+    .appt-item { background: var(--white); border: 1px solid var(--light-gray); padding: 24px 28px; display: flex; align-items: center; gap: 24px; transition: border-color 0.2s; }
+    .appt-item:hover { border-color: var(--gold); }
+    .appt-date { text-align: center; min-width: 64px; }
+    .appt-day { font-family: var(--font-display); font-size: 36px; font-weight: 300; line-height: 1; color: var(--gold); }
+    .appt-month { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); margin-top: 4px; }
+    .appt-divider { width: 1px; height: 56px; background: var(--light-gray); }
+    .appt-details { flex: 1; }
+    .appt-title { font-family: var(--font-display); font-size: 20px; font-weight: 400; margin-bottom: 4px; }
+    .appt-meta { font-size: 12px; font-weight: 300; color: var(--gray); }
+    .appt-status { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 14px; background: rgba(184,150,90,0.1); color: var(--gold); }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state p { font-family: var(--font-display); font-size: 22px; font-weight: 300; font-style: italic; color: var(--gray); margin-bottom: 20px; }
+    .btn-link { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold); padding-bottom: 4px; transition: color 0.2s; }
+    .btn-link:hover { color: var(--gold-light); border-color: var(--gold-light); }
+
+    /* SETTINGS */
+    .settings-row { background: var(--white); border: 1px solid var(--light-gray); padding: 28px 32px; margin-bottom: 16px; }
+    .settings-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+    .settings-value { font-size: 16px; color: var(--black); }
+    .btn-danger { background: transparent; color: #c0392b; border: 1px solid rgba(192,57,43,0.3); padding: 14px 32px; font-family: var(--font-body); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: 24px; }
+    .btn-danger:hover { background: #c0392b; color: white; }
+
+    @media (max-width: 800px) {
+      .wrap { padding: 120px 24px 60px; }
+      nav { padding: 0 24px; }
+      .profile-head { flex-direction: column; text-align: center; gap: 20px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .appt-item { flex-wrap: wrap; }
+    }
+  .wishlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .wl-card { background: var(--white); border: 1px solid var(--light-gray); transition: border-color 0.2s; }
+    .wl-card:hover { border-color: var(--gold); }
+    .wl-img-wrap { aspect-ratio: 1; overflow: hidden; background: var(--light-gray); }
+    .wl-img { width: 100%; height: 100%; object-fit: cover; }
+    .wl-info { padding: 18px 20px; }
+    .wl-name { font-family: var(--font-display); font-size: 18px; font-weight: 400; margin-bottom: 6px; }
+    .wl-cat { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 12px; }
+    .wl-row { display: flex; justify-content: space-between; align-items: center; }
+    .wl-price { font-size: 14px; color: var(--gold); }
+    .wl-remove { background: none; border: none; color: var(--gray); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: color 0.2s; font-family: var(--font-body); }
+    .wl-remove:hover { color: #c0392b; }
+    @media (max-width: 700px) { .wishlist-grid { grid-template-columns: repeat(2, 1fr); } }
+    .order-card { background: var(--white); border: 1px solid var(--light-gray); margin-bottom: 20px; padding: 24px 28px; transition: border-color 0.2s; }
+    .order-card:hover { border-color: var(--gold); }
+    .order-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--light-gray); }
+    .order-id { font-family: var(--font-display); font-size: 22px; font-weight: 400; margin-bottom: 4px; }
+    .order-date { font-size: 12px; color: var(--gray); }
+    .order-status { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 14px; background: rgba(184,150,90,0.1); color: var(--gold); }
+    .order-items { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+    .order-item { display: flex; align-items: center; gap: 16px; }
+    .order-item-img { width: 60px; height: 60px; object-fit: cover; }
+    .order-item-info { flex: 1; }
+    .order-item-name { font-family: var(--font-display); font-size: 16px; font-weight: 400; margin-bottom: 2px; }
+    .order-item-qty { font-size: 12px; color: var(--gray); }
+    .order-item-price { font-size: 14px; color: var(--black); }
+    .order-total { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--light-gray); }
+    .order-total .label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); }
+    .order-total .amount { font-family: var(--font-display); font-size: 26px; color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">MOONSTONE</a>
+  <a href="index.html" class="nav-link">← Back to Store</a>
+</nav>
+
+<div class="wrap">
+  <!-- HEADER -->
+  <div class="profile-head">
+    <div class="avatar" id="profileAvatar">…</div>
+    <div class="profile-info">
+      <h1 id="profileName">Loading…</h1>
+      <p class="email" id="profileEmail">—</p>
+      <span class="badge-member">⭐ Member</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="orders">Orders</button>
+    <button class="tab" data-tab="wishlist">Wishlist</button>
+    <button class="tab" data-tab="appointments">Appointments</button>
+    <button class="tab" data-tab="settings">Settings</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="statOrders">0</div><div class="stat-label">Orders</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWishlist">0</div><div class="stat-label">Wishlist</div></div>
+      <div class="stat-card"><div class="stat-value" id="statAppointments">0</div><div class="stat-label">Appointments</div></div>
+      <div class="stat-card"><div class="stat-value" style="font-size: 26px">New</div><div class="stat-label">Membership</div></div>
+    </div>
+
+    <h2 class="section-title">Upcoming <em>Appointments</em></h2>
+    <div id="overviewAppts"></div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="tab-panel" id="tab-orders">
+    <h2 class="section-title">Order <em>History</em></h2>
+    <div id="ordersContainer">
+      <div class="empty-state"><p>Loading…</p></div>
+    </div>
+  </div>
+
+  <!-- WISHLIST -->
+  <div class="tab-panel" id="tab-wishlist">
+    <h2 class="section-title">My <em>Wishlist</em></h2>
+    <div id="wishlistContainer">
+      <div class="empty-state"><p>Loading…</p></div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENTS -->
+  <div class="tab-panel" id="tab-appointments">
+    <h2 class="section-title">My <em>Appointments</em></h2>
+    <div id="apptList"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="tab-panel" id="tab-settings">
+    <h2 class="section-title">Account <em>Settings</em></h2>
+    <div class="settings-row">
+      <div class="settings-label">Full Name</div>
+      <div class="settings-value" id="settingsName">—</div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-label">Email</div>
+      <div class="settings-value" id="settingsEmail">—</div>
+    </div>
+    <button class="btn-danger" id="logoutBtn">Sign Out</button>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('ms_token');
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  // 📡 Kullanıcıyı API'den çek
+  async function loadUser() {
+    try {
+      const res = await fetch('/api/users/me', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) {
+        localStorage.removeItem('ms_token');
+        localStorage.removeItem('ms_user');
+        window.location.href = 'login.html';
+        return;
+      }
+      const user = await res.json();
+      const fullName = (user.firstName || '') + ' ' + (user.lastName || '');
+      const initials = ((user.firstName?.[0] || '') + (user.lastName?.[0] || '')).toUpperCase() || '👤';
+
+      document.getElementById('profileAvatar').textContent = initials;
+      document.getElementById('profileName').innerHTML = user.firstName + ' <em>' + (user.lastName || '') + '</em>';
+      document.getElementById('profileEmail').textContent = user.email;
+      document.getElementById('settingsName').textContent = fullName.trim();
+      document.getElementById('settingsEmail').textContent = user.email;
+    } catch (err) {
+      console.error('User load failed:', err);
+    }
+  }
+
+  // 📅 Randevuları API'den çek
+  async function loadAppointments() {
+    try {
+      const res = await fetch('/api/appointments', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+
+      const appointments = await res.json();
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+      // Count
+      document.getElementById('statAppointments').textContent = appointments.length;
+
+      // Empty state HTML
+      const emptyHtml = `
+        <div class="empty-state">
+          <p>"No appointments scheduled."</p>
+          <a href="appointment.html" class="btn-link">Book Your Visit</a>
+        </div>
+      `;
+
+      // Render
+      if (appointments.length === 0) {
+        document.getElementById('apptList').innerHTML = emptyHtml;
+        document.getElementById('overviewAppts').innerHTML = emptyHtml;
+        return;
+      }
+
+      // Saat string'ini parse et: "2:30 PM" → 14:30
+      const parseTime = (timeStr) => {
+        const m = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!m) return { h: 0, mn: 0 };
+        let h = parseInt(m[1]);
+        const mn = parseInt(m[2]);
+        if (m[3].toUpperCase() === 'PM' && h !== 12) h += 12;
+        if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
+        return { h, mn };
+      };
+
+      const renderItem = (a) => {
+        const date = new Date(a.appointmentDate);
+        const t = parseTime(a.appointmentTime);
+        date.setHours(t.h, t.mn, 0, 0);
+        const isPast = date < new Date();
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = months[date.getMonth()];
+        return `
+          <div class="appt-item ${isPast ? 'past' : ''}">
+            <div class="appt-date">
+              <div class="appt-day">${day}</div>
+              <div class="appt-month">${month}</div>
+            </div>
+            <div class="appt-divider"></div>
+            <div class="appt-details">
+              <p class="appt-title">${a.service}</p>
+              <p class="appt-meta">${a.appointmentTime} · ${a.duration || ''} ${a.advisor ? '· With ' + a.advisor : ''}</p>
+            </div>
+            <span class="appt-status ${isPast ? 'past' : ''}">${isPast ? '✕ Past' : 'Confirmed'}</span>
+          </div>
+        `;
+      };
+
+      const listHtml = `<div class="appt-list">${appointments.map(renderItem).join('')}</div>`;
+      document.getElementById('apptList').innerHTML = listHtml;
+
+      // Overview shows only upcoming/recent 3
+      const upcoming = appointments.filter(a => {
+        const d = new Date(a.appointmentDate);
+        const t = parseTime(a.appointmentTime);
+        d.setHours(t.h, t.mn, 0, 0);
+        return d >= new Date();
+      });
+      const overviewHtml = upcoming.length > 0
+        ? `<div class="appt-list">${upcoming.slice(0, 3).map(renderItem).join('')}</div>`
+        : `<div class="empty-state"><p>"No upcoming appointments."</p><a href="appointment.html" class="btn-link">Book Your Visit</a></div>`;
+      document.getElementById('overviewAppts').innerHTML = overviewHtml;
+
+    } catch (err) {
+      console.error('Appointments load failed:', err);
+    }
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + target).classList.add('active');
+    });
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to sign out?')) {
+      localStorage.removeItem('ms_token');
+      localStorage.removeItem('ms_user');
+      window.location.href = 'login.html';
+    }
+  });
+
+  loadUser();
+  loadAppointments();
+  // 💝 Wishlist
+  async function loadWishlist() {
+    try {
+      const res = await fetch('/api/wishlist', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+
+      const items = await res.json();
+      document.getElementById('statWishlist').textContent = items.length;
+
+      const container = document.getElementById('wishlistContainer');
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>"Your wishlist is empty."</p>
+            <a href="index.html" class="btn-link">Discover Pieces</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="wishlist-grid">
+          ${items.map(i => `
+            <div class="wl-card">
+              <div class="wl-img-wrap">
+                <img class="wl-img" src="${i.productImageUrl}" alt="${i.productName}" />
+              </div>
+              <div class="wl-info">
+                <p class="wl-name">${i.productName}</p>
+                <p class="wl-cat">${i.productCategory}</p>
+                <div class="wl-row">
+                  <span class="wl-price">$${i.productPrice.toLocaleString()}</span>
+                  <button class="wl-remove" onclick="removeFromWishlist(${i.productId})">Remove</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (err) {}
+  }
+
+  async function removeFromWishlist(productId) {
+    try {
+      const res = await fetch('/api/wishlist/' + productId, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) throw new Error('Failed');
+      loadWishlist();
+    } catch (err) {
+      alert('Could not remove. Please try again.');
+    }
+  }
+
+  loadWishlist();
+  async function loadOrders() {
+    try {
+      const res = await fetch('/api/orders', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+
+      const orders = await res.json();
+      document.getElementById('statOrders').textContent = orders.length;
+      const container = document.getElementById('ordersContainer');
+
+      if (orders.length === 0) {
+        container.innerHTML = `<div class="empty-state"><p>"No orders yet."</p><a href="index.html" class="btn-link">Browse Collection</a></div>`;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        const date = new Date(o.createdAt);
+        const dateStr = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+        return `
+          <div class="order-card">
+            <div class="order-head">
+              <div>
+                <p class="order-id">Order #${o.id}</p>
+                <p class="order-date">${dateStr}</p>
+              </div>
+              <span class="order-status">${o.status}</span>
+            </div>
+            <div class="order-items">
+              ${o.items.map(it => `
+                <div class="order-item">
+                  <img class="order-item-img" src="${it.productImageUrl}" alt="${it.productName}" />
+                  <div class="order-item-info">
+                    <p class="order-item-name">${it.productName}</p>
+                    <p class="order-item-qty">Qty: ${it.quantity} × $${it.priceAtPurchase.toLocaleString()}</p>
+                  </div>
+                  <p class="order-item-price">$${it.subtotal.toLocaleString()}</p>
+                </div>
+              `).join('')}
+            </div>
+            <div class="order-total">
+              <span class="label">Total</span>
+              <span class="amount">$${o.totalAmount.toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {}
+  }
+
+  loadOrders();
+</script>
+
+</body>
+</html>

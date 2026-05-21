@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MOONSTONE — Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+          --cream: #FAF8F5;
+          --black: #0E0E0E;
+          --gold: #B8965A;
+          --gold-light: #D4AF7A;
+          --gray: #888;
+          --light-gray: #E8E4DF;
+          --font-display: 'Cormorant Garamond', serif;
+          --font-body: 'Jost', sans-serif;
+        }
+        body { font-family: var(--font-body); background: var(--cream); color: var(--black); }
+
+        /* NAV */
+        nav {
+          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 0 60px; height: 72px;
+          background: rgba(250,248,245,0.93); backdrop-filter: blur(14px);
+          border-bottom: 1px solid var(--light-gray);
+        }
+        .nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.14em; color: var(--black); text-decoration: none; }
+        .nav-link { font-size: 12px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); text-decoration: none; transition: color 0.2s; }
+        .nav-link:hover { color: var(--gold); }
+
+        /* HEADER */
+        .category-header { padding: 140px 60px 60px; text-align: center; }
+        .category-eyebrow { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+        .category-title { font-family: var(--font-display); font-size: clamp(42px, 6vw, 64px); font-weight: 300; letter-spacing: 0.02em; }
+        .category-title em { font-style: italic; color: var(--gold); }
+        .category-subtitle { font-size: 14px; color: var(--gray); margin-top: 16px; font-weight: 300; }
+
+        /* GRID */
+        .products-wrap { padding: 40px 60px 120px; }
+        .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px 24px; max-width: 1400px; margin: 0 auto; }
+        .pcard { display: flex; flex-direction: column; cursor: pointer; transition: transform 0.4s; position: relative; }
+        .pcard:hover { transform: translateY(-4px); }
+        .pcard-img-wrap { aspect-ratio: 3/4; background: var(--light-gray); overflow: hidden; position: relative; margin-bottom: 18px; }
+        .pcard-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s; }
+        .pcard:hover .pcard-img { transform: scale(1.05); }
+        .pcard-tag { position: absolute; top: 14px; left: 14px; background: var(--gold); color: white; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 12px; }
+        .pcard-name { font-family: var(--font-display); font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+        .pcard-desc { font-size: 12px; color: var(--gray); line-height: 1.6; margin-bottom: 12px; min-height: 38px; }
+        .pcard-bottom { display: flex; justify-content: space-between; align-items: center; }
+        .pcard-price { font-size: 14px; color: var(--black); letter-spacing: 0.04em; }
+        .pcard-add { background: none; border: 1px solid var(--black); padding: 8px 18px; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-family: var(--font-body); color: var(--black); }
+        .pcard-add:hover { background: var(--black); color: var(--cream); }
+
+        /* LOADING / EMPTY */
+        .loading { text-align: center; padding: 60px; font-style: italic; color: var(--gray); }
+        .empty { text-align: center; padding: 80px; color: var(--gray); }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--black); color: var(--cream); padding: 14px 28px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; transition: transform 0.4s; z-index: 1000; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 1000px) {
+          .products-grid { grid-template-columns: repeat(2, 1fr); }
+          nav, .category-header, .products-wrap { padding-left: 24px; padding-right: 24px; }
+        }
+        @media (max-width: 500px) {
+          .products-grid { grid-template-columns: 1fr; }
+        }
+        /* Cart icon */
+    .nav-right { display: flex; align-items: center; gap: 28px; }
+    .btn-cart { background: none; border: none; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; position: relative; color: var(--black); transition: color 0.2s; text-decoration: none; }
+    .btn-cart:hover { color: var(--gold); }
+    .cart-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; background: var(--gold); border-radius: 50%; font-size: 9px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 500; }
+        /* Heart / Wishlist */
+    .heart-btn { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.92); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; z-index: 2; }
+    .heart-btn:hover { transform: scale(1.1); background: white; }
+    .heart-icon { width: 18px; height: 18px; fill: none; stroke: var(--black); stroke-width: 1.8; transition: all 0.2s; }
+    .heart-btn.active .heart-icon { fill: #e63946; stroke: #e63946; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-logo">MOONSTONE</a>
+    <div class="nav-right">
+        <a href="index.html" class="nav-link">← Back to Store</a>
+        <a href="cart.html" class="btn-cart" id="cartBtn" aria-label="Cart">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+        </a>
+    </div>
+</nav>
+
+<header class="category-header">
+    <p class="category-eyebrow">The Collection</p>
+    <h1 class="category-title" id="catTitle">Loading<em>...</em></h1>
+    <p class="category-subtitle" id="catCount"></p>
+</header>
+
+<section class="products-wrap">
+    <div class="products-grid" id="grid">
+        <p class="loading">Loading products…</p>
+    </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // URL'den kategoriyi al
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get('cat') || 'Rings';
+
+    // Başlığı ayarla (yarısı normal, yarısı italic gold)
+    const titleEl = document.getElementById('catTitle');
+    const words = category.split('');
+    const mid = Math.floor(words.length / 2);
+    titleEl.innerHTML = category.substring(0, mid) + '<em>' + category.substring(mid) + '</em>';
+
+    // Ürünleri API'den çek
+    async function loadProducts() {
+      const grid = document.getElementById('grid');
+      try {
+        const res = await fetch(`/api/products?category=${encodeURIComponent(category)}`);
+        const products = await res.json();
+
+        document.getElementById('catCount').textContent = products.length + ' piece' + (products.length !== 1 ? 's' : '');
+
+        if (products.length === 0) {
+          grid.innerHTML = '<p class="empty">No products in this collection yet.</p>';
+          return;
+        }
+
+        grid.innerHTML = products.map(p => `
+          <div class="pcard">
+            <div class="pcard-img-wrap">
+              <img class="pcard-img" src="${p.imageUrl}" alt="${p.name}" loading="lazy" />
+              <button class="heart-btn" data-product-id="${p.id}" onclick="toggleWishlist(${p.id}, this)" aria-label="Add to wishlist">
+                <svg class="heart-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              ${p.tag ? `<span class="pcard-tag">${p.tag}</span>` : ''}
+            </div>
+            <p class="pcard-name">${p.name}</p>
+            <p class="pcard-desc">${p.description || ''}</p>
+            <div class="pcard-bottom">
+              <span class="pcard-price">$${p.price.toLocaleString()}</span>
+              <button class="pcard-add" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}')">Add to Cart</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        grid.innerHTML = '<p class="empty">Could not load products. Please try again.</p>';
+        console.error(err);
+      }
+    }
+
+    // Sepete ekle (Faz 3'te tam implementasyon)
+    async function addToCart(id, name) {
+    const token = localStorage.getItem('ms_token');
+
+    if (!token) {
+      showToast('Please sign in to add items');
+      setTimeout(() => window.location.href = 'login.html', 1500);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ productId: id, quantity: 1 })
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem('ms_token');
+        showToast('Session expired. Please sign in.');
+        setTimeout(() => window.location.href = 'login.html', 1500);
+        return;
+      }
+
+      if (!res.ok) throw new Error('Failed');
+
+      showToast(name + ' added to cart');
+      updateCartBadge();
+    } catch (err) {
+      showToast('Could not add to cart');
+      console.error(err);
+    }
+  }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    loadProducts();
+    // Cart badge — API'den güncel sayıyı çek
+  async function updateCartBadge() {
+    const token = localStorage.getItem('ms_token');
+    if (!token) return;
+
+    try {
+      const res = await fetch('/api/cart', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+
+      const items = await res.json();
+      const count = items.reduce((sum, i) => sum + i.quantity, 0);
+      const badge = document.getElementById('cartBadge');
+
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch (err) {}
+  }
+
+  updateCartBadge();
+    // 💝 Wishlist yönetimi
+  let wishlistIds = new Set();
+
+  async function loadWishlistIds() {
+    const token = localStorage.getItem('ms_token');
+    if (!token) return;
+    try {
+      const res = await fetch('/api/wishlist', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+      const items = await res.json();
+      wishlistIds = new Set(items.map(i => i.productId));
+      document.querySelectorAll('.heart-btn').forEach(btn => {
+        const id = parseInt(btn.dataset.productId);
+        if (wishlistIds.has(id)) btn.classList.add('active');
+      });
+    } catch (err) {}
+  }
+
+  async function toggleWishlist(productId, btn) {
+    const token = localStorage.getItem('ms_token');
+    if (!token) {
+      showToast('Please sign in to use wishlist');
+      setTimeout(() => window.location.href = 'login.html', 1500);
+      return;
+    }
+
+    const inList = wishlistIds.has(productId);
+    const method = inList ? 'DELETE' : 'POST';
+
+    try {
+      const res = await fetch('/api/wishlist/' + productId, {
+        method: method,
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem('ms_token');
+        window.location.href = 'login.html';
+        return;
+      }
+      if (!res.ok) throw new Error('Failed');
+
+      if (inList) {
+        wishlistIds.delete(productId);
+        btn.classList.remove('active');
+        showToast('Removed from wishlist');
+      } else {
+        wishlistIds.add(productId);
+        btn.classList.add('active');
+        showToast('Added to wishlist');
+      }
+    } catch (err) {
+      showToast('Could not update wishlist');
+    }
+  }
+
+  setTimeout(loadWishlistIds, 500);
+</script>
+
+</body>
+</html>
